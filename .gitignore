@@ -1,4 +1,8 @@
 c#/Application/bin
 c#/Application/obj
+
+c#-interactive/bin
+c#-interactive/obj
+
 .vscode
 .cursor
