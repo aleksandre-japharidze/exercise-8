@@ -4,13 +4,11 @@
     {
     }
 
-    public NegativeAmountException(string message)
-        : base(message)
+    public NegativeAmountException(string message) : base(message)
     {
     }
 
-    public NegativeAmountException(string message, Exception inner)
-        : base(message, inner)
+    public NegativeAmountException(string message, Exception inner) : base(message, inner)
     {
     }
 }
@@ -21,33 +19,35 @@ class InsufficientFundsException : Exception
     {
     }
 
-    public InsufficientFundsException(string message)
-        : base(message)
+    public InsufficientFundsException(string message) : base(message)
     {
     }
 
-    public InsufficientFundsException(string message, Exception inner)
-        : base(message, inner)
+    public InsufficientFundsException(string message, Exception inner) : base(message, inner)
     {
     }
 }
 
 class BankAccount
 {
+    public string Owner { get; private set; }
+    public decimal Balance { get; private set; }
+
     public BankAccount(string owner, decimal initialBalance)
     {
+        if (initialBalance < 0)
+        {
+            throw new NegativeAmountException("Initial balance cannot be negative");
+        }
         Owner = owner;
         Balance = initialBalance;
     }
-
-    public string Owner { get; set; }
-    public decimal Balance { get; private set; }
 
     public void Deposit(decimal amount)
     {
         if (amount < 0)
         {
-            throw new NegativeAmountException("Deposit amount cannot be negative.");
+            throw new NegativeAmountException("Deposit amount cannot be negative");
         }
 
         Balance += amount;
@@ -57,12 +57,11 @@ class BankAccount
     {
         if (amount < 0)
         {
-            throw new NegativeAmountException("Withdrawal amount cannot be negative.");
+            throw new NegativeAmountException("Withdraw amount cannot be negative");
         }
-
-        if (amount > Balance)
+        else if (amount > Balance)
         {
-            throw new InsufficientFundsException("Insufficient funds for this withdrawal.");
+            throw new InsufficientFundsException("Insufficient funds");
         }
 
         Balance -= amount;
@@ -73,24 +72,27 @@ class Program
 {
     static void Main(string[] args)
     {
-        BankAccount account = new BankAccount("Alice", 1000);
-
+        BankAccount account = new BankAccount("John Doe", 1000);
         try
         {
             account.Deposit(500);
-            Console.WriteLine($"Balance after deposit: {account.Balance}");
-
             account.Withdraw(2000);
-            Console.WriteLine($"Balance after withdrawal: {account.Balance}");
-        } catch (NegativeAmountException ex)
+        }
+        catch (InsufficientFundsException e)
         {
-            Console.WriteLine($"Error: {ex.Message}");
-        } catch (InsufficientFundsException ex)
+            Console.WriteLine(e.Message);
+        }
+        catch (NegativeAmountException e)
         {
-            Console.WriteLine($"Error: {ex.Message}");
-        } finally
+            Console.WriteLine(e.Message);
+        }
+        catch (Exception e)
         {
-            Console.WriteLine($"Final balance: {account.Balance}");
+            Console.WriteLine(e.Message);
+        }
+        finally
+        {
+            Console.WriteLine("Account balance: " + account.Balance);
         }
     }
 }
